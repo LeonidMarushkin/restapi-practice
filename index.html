@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <style>
+        #goods {
+            max-width: 1111px;
+            border: 1px solid red;
+            box-shadow: -1px 7px 6px 4px gold;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5%;
+        }
+
+        .good {
+            border: 1px solid rgb(0, 17, 255);
+            padding: 10px;
+            width: 25%;
+        }
+    </style>
+    <h1>Main page</h1>
+    <a href="./catalog.html">Catalog</a>
+    <button id="loadButton">Load goods</button>
+
+    <div id="goods">
+        <!-- <div class="good">
+            <h2 class="good__head">Header</h2>
+            <p class="good__desc">Description</p>
+            <p class="good__price">Price</p>
+        </div> -->
+    </div>
+    <script>
+        const loadButton = document.getElementById("loadButton");
+        const goodsContainer = document.getElementById("goods");
+
+        // const state = {
+        //     goods: []
+        // };
+
+        const state = new Proxy(
+            { goods: [] },
+            {
+                set(target, path, value) {
+                    target[path] = value;
+                    if (path === 'goods') {
+                        renderGoods(target);
+                    }
+
+                }
+            });
+
+        loadButton.addEventListener('click', function (e) {
+            fetch('http://localhost:10001/goods')
+                .then(res => {
+                    return res.json();
+                })
+                .then((data) => {
+                    state.goods = data;
+                })
+                .catch(e => console.log(e));
+        });
+
+        const renderGoods = (state) => {
+            const { goods } = state;
+            goodsContainer.innerHTML = '';
+            goods.forEach(good => {
+                const goodWrap = document.createElement('div');
+                goodWrap.classList.add('good');
+
+                const goodHead = document.createElement('h2');
+                goodHead.classList.add('good__head');
+                goodHead.textContent = good.title;
+
+                const goodDesc = document.createElement('p');
+                goodDesc.classList.add('good__desc');
+                goodDesc.textContent = good.description;
+
+                const goodPrice = document.createElement('p');
+                goodPrice.classList.add('good__price');
+                goodPrice.textContent = good.price;
+
+                goodWrap.appendChild(goodHead);
+                goodWrap.appendChild(goodDesc);
+                goodWrap.appendChild(goodPrice);
+
+                goodsContainer.appendChild(goodWrap);
+            });
+
+        }
+    </script>
+</body>
+
+</html>
